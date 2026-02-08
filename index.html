@@ -4,337 +4,146 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Career Oracle - AI职场决策顾问</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            line-height: 1.6;
-            background-color: #f8f9fa;
-            color: #212529;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 800px;
-            margin: auto;
-            background: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        h1, h2 {
-            color: #343a40;
-            border-bottom: 2px solid #007bff;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-        h1 { text-align: center; }
-        textarea {
-            width: 100%;
-            padding: 15px;
-            border-radius: 5px;
-            border: 1px solid #ced4da;
-            font-size: 16px;
-            margin-bottom: 20px;
-            box-sizing: border-box;
-        }
-        button {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            font-size: 18px;
-            font-weight: bold;
-            color: #fff;
-            background-color: #007bff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        #loading {
-            text-align: center;
-            padding: 20px;
-            display: none;
-            color: #007bff;
-        }
-        .report-section {
-            margin-top: 30px;
-            padding: 20px;
-            border: 1px solid #e9ecef;
-            border-radius: 5px;
-            background: #f8f9fa;
-        }
-
-        .pricing-table {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 30px;
-            flex-wrap: wrap;
-        }
-        .pricing-card {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            width: 30%;
-            min-width: 220px;
-            margin: 10px;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        .pricing-card h3 { margin-top: 0; color: #007bff;}
-        .price { font-size: 24px; font-weight: bold; margin: 15px 0; }
-        .pricing-card ul { list-style: none; padding: 0; margin-bottom: 20px; text-align: left;}
-        .pricing-card li { margin-bottom: 10px; }
-        .pricing-card button {
-            font-size: 16px;
-       padding: 10px;
-            margin-top: auto;
-        }
-
-        /* --- 支付弹窗样式 --- */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.6);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-        .modal-content {
-            background: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            width: 320px;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            position: relative;
-        }
-        .modal-close {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
-            color: #aaa;
-        }
-        .modal-content h3 { margin-top: 0; }
-        #qr-code-image {
-            width: 250px;
-            height: 250px;
-            margin: 15px auto;
-            display: block;
-            border: 1px solid #eee;
-        }
-        /* --- 弹窗样式结束 --- */
-
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; line-height: 1.6; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: #fff; padding: 40px; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        h1 { text-align: center; color: #667eea; font-size: 2.5em; margin-bottom: 10px; }
+        .subtitle { text-align: center; color: #6c757d; margin-bottom: 30px; }
+        h2 { color: #343a40; border-left: 4px solid #667eea; padding-left: 15px; margin: 30px 0 20px; }
+        textarea { width: 100%; padding: 18px; border-radius: 10px; border: 2px solid #e9ecef; font-size: 16px; resize: vertical; font-family: inherit; }
+        textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 4px rgba(102,126,234,0.1); }
+        .btn { display: block; width: 100%; padding: 18px; font-size: 18px; font-weight: bold; color: #fff; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 10px; cursor: pointer; margin-top: 15px; }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(102,126,234,0.4); }
+        .btn:disabled { background: #adb5bd; transform: none; cursor: not-allowed; }
+        #trial-info { text-align: center; padding: 12px; border-radius: 8px; margin: 20px 0; font-weight: 600; background: #d4edda; color: #155724; }
+        #loading { text-align: center; padding: 40px; display: none; }
+        .spinner { width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid #667eea; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .report-section { margin-top: 30px; padding: 30px; background: #f8f9fa; border-radius: 12px; border-left: 5px solid #667eea; }
+        .report-section h2, .report-section h3 { color: #495057; border: none; padding: 0; }
+        .error-msg { color: #721c24; background: #f8d7da; padding: 20px; border-radius: 10px; text-align: center; margin-top: 20px; }
+        .pricing-table { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 25px; }
+        .pricing-card { background: #fff; border: 2px solid #e9ecef; border-radius: 12px; padding: 25px; width: 220px; text-align: center; }
+        .pricing-card:hover { transform: translateY(-5px); border-color: #667eea; }
+        .pricing-card.featured { border-color: #667eea; transform: scale(1.05); }
+        .pricing-card h3 { color: #667eea; margin-bottom: 15px; }
+        .price { font-size: 36px; font-weight: bold; }
+        .pricing-card ul { list-style: none; text-align: left; margin: 20px 0; font-size: 14px; }
+        .pricing-card li { padding: 8px 0 8px 25px; position: relative; }
+        .pricing-card li::before { content: "✓"; position: absolute; left: 0; color: #28a745; }
+        .pricing-card .btn { font-size: 14px; padding: 12px; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: #fff; padding: 35px; border-radius: 16px; width: 360px; text-align: center; position: relative; }
+        .modal-close { position: absolute; top: 15px; right: 20px; font-size: 28px; cursor: pointer; color: #aaa; }
+        #payment-amount { font-size: 42px; color: #dc3545; font-weight: bold; margin: 15px 0; }
+        #qr-code-image { width: 200px; height: 200px; margin: 20px auto; display: block; border-radius: 10px; border: 2px solid #eee; }
+        footer { text-align: center; margin-top: 40px; color: #6c757d; font-size: 14px; }
     </style>
 </head>
 <body>
-
     <div class="container">
-        <h1>Career Oracle</h1>
-        <p style="text-align: center; color: #6c757d;">您的私人AI职场决策顾问</p>
-
-        <h2>第一步：输入您的情况</h2>
-        <p>请输入您的个人背景、技能、职业困惑、目标等信息。描述越详细，AI的分析报告越精准。</p>
-        <textarea id="userInput" rows="10" placeholder="例如：我今年28岁，在一家互联网公司做3年运营，感觉进入了瓶颈期，工资涨不上去，也学不到新东西。我对AIGC很感兴趣，但不知道是否该转行，以及如何转行..."></textarea>
-
-        <p id="trial-info" style="text-align: center; color: #6c757d; font-weight: bold; margin-bottom: 15px;"></p>
-        
-        <button id="generate-button" onclick="generateReport()">生成我的职场决策报告</button>
-
-        <div id="loading">正在调用全球职场数据库和AI模型进行分析，请稍候...</div>
-
+        <h1>🔮 Career Oracle</h1>
+        <p class="subtitle">AI驱动的职场决策顾问</p>
+        <h2>📝 描述您的情况</h2>
+        <textarea id="userInput" rows="8" placeholder="例如：我今年28岁，在互联网公司做了3年运营，感觉遇到瓶颈..."></textarea>
+        <div id="trial-info"></div>
+        <button id="generate-button" class="btn" onclick="handleGeneration()">🚀 生成我的职场决策报告</button>
+        <div id="loading"><div class="spinner"></div><p style="color:#667eea;">AI正在分析中，请稍候（约15-30秒）...</p></div>
         <div id="report-output"></div>
-
-        <hr style="margin-top: 40px;">
-        
-        <h2>产品定价</h2>
-        <div class="pricing-table">
-            <div class="pricing-card">
-                <div>
-                    <h3>单次咨询</h3>
-                    <p class="price">¥1</p>
-                    <ul>
-                        <li>✓ 一次性完整报告生成</li>
-                        <li>✓ 基础职业路径分析</li>
-                        <li>✓ 核心技能评估</li>
-                        <li>✓ Email 支持</li>
-                    </ul>
-                </div>
-                <button onclick="showPaymentModal('单次咨询', '1')">立即购买</button>
-            </div>
-            <div class="pricing-card" style="border-color: #007bff; transform: scale(1.05);">
-                <div>
-                    <h3>年度订阅</h3>
-                    <p class="price">¥18 / 年</p>
-                    <ul>
-                        <li>✓ 无限次报告生成</li>
-                        <li>✓ 高级职业路径模拟</li>
-                        <li>✓ 全方位技能矩阵分析</li>
-                        <li>✓ 月度行业趋势追踪</li>
-                        <li>✓ 优先 Email 支持</li>
-                    </ul>
-                </div>
-                <button onclick="showPaymentModal('年度订阅', '18')">立即订阅</button>
-            </div>
-            <div class="pricing-card">
-                <div>
-                    <h3>企业服务</h3>
-                    <p class="price">联系我们</p>
-                    <ul>
-                        <li>✓ 员工职业发展规划</li>
-                        <li>✓ 团队技能模型构建</li>
-                        <li>✓ 人才梯队建设咨询</li>
-                        <li>✓ 专属客户经理</li>
-                    </ul>
-                </div>
-                <button onclick="alert('请通过邮件联系 aiteamo@example.com 进行咨询')">联系我们</button>
+        <div style="margin-top:50px;padding-top:30px;border-top:2px solid #e9ecef;">
+            <h2>💎 产品与服务</h2>
+            <div class="pricing-table">
+                <div class="pricing-card"><h3>单次咨询</h3><p class="price">¥1</p><ul><li>AI驱动分析</li><li>完整职业报告</li></ul><button class="btn" onclick="showPaymentModal('单次咨询','1')">购买</button></div>
+                <div class="pricing-card featured"><h3>年度会员</h3><p class="price">¥18</p><ul><li>无限次报告</li><li>持续更新</li></ul><button class="btn" onclick="showPaymentModal('年度会员','18')">订阅</button></div>
+                <div class="pricing-card"><h3>导出报告</h3><p class="price">¥1</p><ul><li>导出文件</li><li>永久保存</li></ul><button class="btn" onclick="exportReport()">导出</button></div>
             </div>
         </div>
-
+        <footer><p>© 2024 Career Oracle · Powered by Kimi AI</p></footer>
     </div>
-
-    <!-- 支付弹窗 HTML -->
     <div id="payment-modal" class="modal-overlay" onclick="closeModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <span class="modal-close" onclick="closeModal()">&times;</span>
             <h3 id="payment-title">支付</h3>
-            <p>请使用支付宝或微信扫码支付</p>
-            <p style="font-weight: bold; font-size: 28px; color: #d9534f;" id="payment-amount"></p>
-            <img id="qr-code-image" src="https://s41.ax1x.com/2026/02/08/pZTtJWn.jpg" alt="收款二维码">
-            <p style="font-size: 12px; color: #777;">支付后，请将“付款截图”和您的“咨询问题”发送至<br>aiteamo@example.com<br>我们会在24小时内为您发送报告。</p>
+            <p id="payment-amount"></p>
+            <img id="qr-code-image" src="" alt="二维码">
+            <button class="btn" onclick="confirmPayment()" style="margin-top:20px">✅ 我已完成支付</button>
         </div>
     </div>
-    <!-- 弹窗HTML结束 -->
-
     <script>
-        const freeTrials = 3;
-        let generationCount = parseInt(localStorage.getItem('careerOracleGenerations') || '0');
+        const API_ENDPOINT = '/api/chat';
+        const QR_CODE_URL = 'https://s21.ax1x.com/2025/03/19/pEQuRiD.jpg';
+        const FREE_TRIALS = 3;
+        let count = parseInt(localStorage.getItem('careerCount') || '0');
+        let currentReport = '';
+        let payCallback = null;
 
-        // 在页面加载时更新剩余次数提示
-        window.onload = function() {
-            updateTrialInfo();
-        };
+        window.onload = updateInfo;
 
-        function updateTrialInfo() {
-            const trialInfo = document.getElementById('trial-info');
-            const generateButton = document.getElementById('generate-button');
-            
-            if (generationCount < freeTrials) {
-                trialInfo.textContent = `您还剩下 ${freeTrials - generationCount} 次免费生成机会。`;
-                generateButton.textContent = '免费生成我的职场决策报告';
+        function updateInfo() {
+            const info = document.getElementById('trial-info');
+            const btn = document.getElementById('generate-button');
+            const left = FREE_TRIALS - count;
+            if (left > 0) {
+                info.innerHTML = '🎁 您还有 <strong>' + left + '</strong> 次免费机会';
+                btn.textContent = '🚀 免费生成我的职场决策报告';
             } else {
-                trialInfo.textContent = '免费次数已用完。再次生成报告或购买会员后可继续使用。';
-                generateButton.textContent = '生成我的职场决策报告 (¥1)';
+                info.style.background = '#fff3cd'; info.style.color = '#856404';
+                info.innerHTML = '⚡ 免费次数已用完';
+                btn.textContent = '🚀 生成报告 (¥1)';
             }
         }
 
-        function generateReport() {
-            const userInput = document.getElementById('userInput').value;
-            const loadingDiv = document.getElementById('loading');
-            const reportOutputDiv = document.getElementById('report-output');
+        function handleGeneration() {
+            if (!document.getElementById('userInput').value.trim()) { alert('请输入您的情况'); return; }
+            if (count < FREE_TRIALS) callAI(); else showPaymentModal('生成报告', '1', callAI);
+        }
 
-            if (userInput.trim() === "") {
-                alert("请输入您的基本情况，以便AI为您分析。");
-                return;
-            }
-
-            if (generationCount < freeTrials) {
-                // --- 免费生成逻辑 ---
-                loadingDiv.style.display = 'block';
-                reportOutputDiv.innerHTML = '';
-
-                setTimeout(() => {
-                    loadingDiv.style.display = 'none';
-                    const reportHTML = generateReportContent(); // 获取报告内容
-                    reportOutputDiv.innerHTML = reportHTML;
-                    
-                    generationCount++;
-                    localStorage.setItem('careerOracleGenerations', generationCount);
-                    updateTrialInfo();
-                }, 2500);
-
-            } else {
-                // --- 付费生成逻辑 ---
-                showPaymentModal('生成决策报告', '1');
-            }
+        async function callAI() {
+            const input = document.getElementById('userInput').value.trim();
+            const loading = document.getElementById('loading');
+            const output = document.getElementById('report-output');
+            const btn = document.getElementById('generate-button');
+            closeModal(); loading.style.display = 'block'; output.innerHTML = ''; btn.disabled = true;
+            try {
+                const res = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userInput: input })
+                });
+                const data = await res.json();
+                if (!res.ok || data.error) throw new Error(data.error || '请求失败');
+                if (!data.report) throw new Error('AI未返回报告');
+                currentReport = data.report;
+                output.innerHTML = '<div class="report-section">' + marked.parse(data.report) + '</div>';
+                if (count < FREE_TRIALS) { count++; localStorage.setItem('careerCount', count); updateInfo(); }
+                output.scrollIntoView({ behavior: 'smooth' });
+            } catch (e) {
+                output.innerHTML = '<div class="error-msg">❌ ' + e.message + '</div>';
+            } finally { loading.style.display = 'none'; btn.disabled = false; }
         }
 
         function exportReport() {
-            // 导出功能统一要求付费
-            showPaymentModal('付费导出报告', '1');
+            if (!currentReport) { alert('请先生成报告'); return; }
+            showPaymentModal('导出报告', '1', () => {
+                const blob = new Blob([currentReport], { type: 'text/markdown' });
+                const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+                a.download = 'Career_Oracle_报告.md'; a.click(); closeModal(); alert('✅ 导出成功！');
+            });
         }
 
-        function generateReportContent() {
-            // 此函数仅用于生成报告的HTML内容，方便复用
-            return `
-                <div class="report-section">
-                    <h2>第二步：您的AI职场决策报告 (示例)</h2>
-                    
-                    <h3>1. 核心优势评估 (Strengths)</h3>
-                    <p><strong>运营经验丰富：</strong>3年的互联网运营经验为您构建了坚实的执行和项目管理基础。您熟悉用户增长、活动策划和数据分析等关键环节。</p>
-                    <p><strong>市场敏感度：</strong>您能敏锐地察觉到AIGC等新兴技术趋势，并主动寻求结合点，这是职业转型和突破的关键驱动力。</p>
-                    
-                    <h3>2. 潜在机会 (Opportunities)</h3>
-                    <p><strong>AIGC+运营岗（蓝海市场）：</strong>目前市场上同时精通AI技术和运营增长的复合型人才稀缺。您可以利用现有运营经验，快速切入“AI产品增长经理”、“AIGC内容策略师”等新兴岗位，薪资和发展空间巨大。</p>
-                    <p><strong>传统行业赋能：</strong>利用您的运营知识和对AIGC的理解，为传统企业提供数字化转型咨询，市场广阔。</p>
-
-                    <h3>3. 内部风险 (Weaknesses)</h3>
-                    <p><strong>技术壁垒：</strong>作为非技术背景出身，直接转型纯算法或开发岗存在较高的学习门槛和时间成本。</p>
-
-                    <h3>4. 外部挑战 (Threats)</h3>
-                    <p><strong>技术快速迭代：</strong>AIGC领域技术日新月异，需要持续不断的学习才能跟上步伐。</p>
-
-                    <h3>5. 颠覆性行动方案建议</h3>
-                    <p><strong>短期(1-3个月) - 技能准备与初始资源积累：</strong></p>
-                    <ul>
-                        <li><strong>不要辞职！</strong> 在职学习，保持现金流稳定。</li>
-                        <li><strong>专注应用层学习：</strong>不要陷入算法细节。  집중于学习如何使用主流AIGC工具（如ChatGPT, Midjourney, Stable Diffusion API等）解决实际的运营问题。例如，用ChatGPT做营销文案矩阵，用Midjourney生成广告素材。</li>
-                        <li><strong>产出作品集：</strong>将您的学习实践整理成一个在线作品集（例如一个简单的博客或Notion页面），展示您如何用AI技术为业务带来降本增效。这是您新岗位的敲门砖。</li>
-                    </ul>
-                    <p><strong>中期(3-6个月) - 切入市场与价值验证：</strong></p>
-                    <ul>
-                        <li><strong>在当前公司内部寻找机会：</strong>尝试将您的AIGC能力应用于本职工作，做出可量化的成绩，争取内部转岗或获得项目经验背书。</li>
-                        <li><strong>寻求外部“副业”项目：</strong>在Upwork、Fiverr或国内的远程工作平台，承接一些小型的AIGC内容生成、运营优化项目，积累实战经验和早期收入。</li>
-                        <li><strong>建立个人品牌：</strong>在知乎、即刻、LinkedIn等平台分享您的AIGC运营实战心得，吸引潜在雇主或合作伙伴的注意。</li>
-                    </ul>
-                    <p><strong>长期(6-12个月) - 实现职业跃迁：</strong></p>
-                    <ul>
-                        <li><strong>寻求高价值职位：</strong>凭借您的作品集、项目经验和个人品牌，瞄准“AI产品增长”、“AIGC策略师”等高薪职位，完成从传统运营到AI交叉领域人才的华丽转身。</li>
-                    </ul>
-                    <button onclick="exportReport()" style="margin-top:20px; background-color:#28a745; width: auto; padding: 10px 20px;">付费导出报告 (¥1)</button>
-                </div>
-            `;
+        function showPaymentModal(title, price, cb) {
+            document.getElementById('payment-title').textContent = '支付：' + title;
+            document.getElementById('payment-amount').textContent = '¥' + price;
+            document.getElementById('qr-code-image').src = QR_CODE_URL;
+            document.getElementById('payment-modal').style.display = 'flex';
+            payCallback = cb;
         }
 
-        /* --- 支付弹窗 Javascript --- */
-        const modal = document.getElementById('payment-modal');
-        
-        function showPaymentModal(productName, price) {
-            document.getElementById('payment-title').innerText = '支付：' + productName;
-            document.getElementById('payment-amount').innerText = '¥ ' + price;
-            document.getElementById('qr-code-image').src = 'https://s41.ax1x.com/2026/02/08/pZTtJWn.jpg'; // 确保二维码地址正确
-            modal.style.display = 'flex';
-        }
-
-        function closeModal() {
-            modal.style.display = 'none';
-        }
-        /* --- 弹窗JS结束 --- */
-
+        function confirmPayment() { if (payCallback) { payCallback(); payCallback = null; } }
+        function closeModal() { document.getElementById('payment-modal').style.display = 'none'; payCallback = null; }
     </script>
-
 </body>
 </html>
        
