@@ -92,7 +92,7 @@
         .pricing-card li { margin-bottom: 10px; }
         .pricing-card button {
             font-size: 16px;
-            padding: 10px;
+       padding: 10px;
             margin-top: auto;
         }
 
@@ -149,7 +149,9 @@
         <p>请输入您的个人背景、技能、职业困惑、目标等信息。描述越详细，AI的分析报告越精准。</p>
         <textarea id="userInput" rows="10" placeholder="例如：我今年28岁，在一家互联网公司做3年运营，感觉进入了瓶颈期，工资涨不上去，也学不到新东西。我对AIGC很感兴趣，但不知道是否该转行，以及如何转行..."></textarea>
 
-        <button onclick="generateReport()">生成我的职场决策报告</button>
+        <p id="trial-info" style="text-align: center; color: #6c757d; font-weight: bold; margin-bottom: 15px;"></p>
+        
+        <button id="generate-button" onclick="generateReport()">生成我的职场决策报告</button>
 
         <div id="loading">正在调用全球职场数据库和AI模型进行分析，请稍候...</div>
 
@@ -162,7 +164,7 @@
             <div class="pricing-card">
                 <div>
                     <h3>单次咨询</h3>
-                    <p class="price">¥29.9</p>
+                    <p class="price">¥1</p>
                     <ul>
                         <li>✓ 一次性完整报告生成</li>
                         <li>✓ 基础职业路径分析</li>
@@ -170,12 +172,12 @@
                         <li>✓ Email 支持</li>
                     </ul>
                 </div>
-                <button onclick="showPaymentModal('单次咨询', '29.9')">立即购买</button>
+                <button onclick="showPaymentModal('单次咨询', '1')">立即购买</button>
             </div>
             <div class="pricing-card" style="border-color: #007bff; transform: scale(1.05);">
                 <div>
                     <h3>年度订阅</h3>
-                    <p class="price">¥199 / 年</p>
+                    <p class="price">¥18 / 年</p>
                     <ul>
                         <li>✓ 无限次报告生成</li>
                         <li>✓ 高级职业路径模拟</li>
@@ -184,7 +186,7 @@
                         <li>✓ 优先 Email 支持</li>
                     </ul>
                 </div>
-                <button onclick="showPaymentModal('年度订阅', '199')">立即订阅</button>
+                <button onclick="showPaymentModal('年度订阅', '18')">立即订阅</button>
             </div>
             <div class="pricing-card">
                 <div>
@@ -210,13 +212,34 @@
             <h3 id="payment-title">支付</h3>
             <p>请使用支付宝或微信扫码支付</p>
             <p style="font-weight: bold; font-size: 28px; color: #d9534f;" id="payment-amount"></p>
-            <img id="qr-code-image" src="" alt="收款二维码">
+            <img id="qr-code-image" src="https://s41.ax1x.com/2026/02/08/pZTtJWn.jpg" alt="收款二维码">
             <p style="font-size: 12px; color: #777;">支付后，请将“付款截图”和您的“咨询问题”发送至<br>aiteamo@example.com<br>我们会在24小时内为您发送报告。</p>
         </div>
     </div>
     <!-- 弹窗HTML结束 -->
 
     <script>
+        const freeTrials = 3;
+        let generationCount = parseInt(localStorage.getItem('careerOracleGenerations') || '0');
+
+        // 在页面加载时更新剩余次数提示
+        window.onload = function() {
+            updateTrialInfo();
+        };
+
+        function updateTrialInfo() {
+            const trialInfo = document.getElementById('trial-info');
+            const generateButton = document.getElementById('generate-button');
+            
+            if (generationCount < freeTrials) {
+                trialInfo.textContent = `您还剩下 ${freeTrials - generationCount} 次免费生成机会。`;
+                generateButton.textContent = '免费生成我的职场决策报告';
+            } else {
+                trialInfo.textContent = '免费次数已用完。再次生成报告或购买会员后可继续使用。';
+                generateButton.textContent = '生成我的职场决策报告 (¥1)';
+            }
+        }
+
         function generateReport() {
             const userInput = document.getElementById('userInput').value;
             const loadingDiv = document.getElementById('loading');
@@ -227,66 +250,81 @@
                 return;
             }
 
-            loadingDiv.style.display = 'block';
-            reportOutputDiv.innerHTML = '';
+            if (generationCount < freeTrials) {
+                // --- 免费生成逻辑 ---
+                loadingDiv.style.display = 'block';
+                reportOutputDiv.innerHTML = '';
 
-            // 模拟AI分析过程
-            setTimeout(() => {
-                loadingDiv.style.display = 'none';
+                setTimeout(() => {
+                    loadingDiv.style.display = 'none';
+                    const reportHTML = generateReportContent(); // 获取报告内容
+                    reportOutputDiv.innerHTML = reportHTML;
+                    
+                    generationCount++;
+                    localStorage.setItem('careerOracleGenerations', generationCount);
+                    updateTrialInfo();
+                }, 2500);
 
-                const reportHTML = `
-                    <div class="report-section">
-                        <h2>第二步：您的AI职场决策报告 (示例)</h2>
-                        
-                        <h3>1. 核心优势评估 (Strengths)</h3>
-                        <p><strong>运营经验丰富：</strong>3年的互联网运营经验为您构建了坚实的执行和项目管理基础。您熟悉用户增长、活动策划和数据分析等关键环节。</p>
-                        <p><strong>市场敏感度：</strong>您能敏锐地察觉到AIGC等新兴技术趋势，并主动寻求结合点，这是职业转型和突破的关键驱动力。</p>
-                        
-                        <h3>2. 潜在机会 (Opportunities)</h3>
-                        <p><strong>AIGC+运营岗（蓝海市场）：</strong>目前市场上同时精通AI技术和运营增长的复合型人才稀缺。您可以利用现有运营经验，快速切入“AI产品增长经理”、“AIGC内容策略师”等新兴岗位，薪资和发展空间巨大。</p>
-                        <p><strong>传统行业赋能：</strong>利用您的运营知识和对AIGC的理解，为传统企业提供数字化转型咨询，市场广阔。</p>
+            } else {
+                // --- 付费生成逻辑 ---
+                showPaymentModal('生成决策报告', '1');
+            }
+        }
 
-                        <h3>3. 内部风险 (Weaknesses)</h3>
-                        <p><strong>技术壁垒：</strong>作为非技术背景出身，直接转型纯算法或开发岗存在较高的学习门槛和时间成本。</p>
+        function exportReport() {
+            // 导出功能统一要求付费
+            showPaymentModal('付费导出报告', '1');
+        }
 
-                        <h3>4. 外部挑战 (Threats)</h3>
-                        <p><strong>技术快速迭代：</strong>AIGC领域技术日新月异，需要持续不断的学习才能跟上步伐。</p>
+        function generateReportContent() {
+            // 此函数仅用于生成报告的HTML内容，方便复用
+            return `
+                <div class="report-section">
+                    <h2>第二步：您的AI职场决策报告 (示例)</h2>
+                    
+                    <h3>1. 核心优势评估 (Strengths)</h3>
+                    <p><strong>运营经验丰富：</strong>3年的互联网运营经验为您构建了坚实的执行和项目管理基础。您熟悉用户增长、活动策划和数据分析等关键环节。</p>
+                    <p><strong>市场敏感度：</strong>您能敏锐地察觉到AIGC等新兴技术趋势，并主动寻求结合点，这是职业转型和突破的关键驱动力。</p>
+                    
+                    <h3>2. 潜在机会 (Opportunities)</h3>
+                    <p><strong>AIGC+运营岗（蓝海市场）：</strong>目前市场上同时精通AI技术和运营增长的复合型人才稀缺。您可以利用现有运营经验，快速切入“AI产品增长经理”、“AIGC内容策略师”等新兴岗位，薪资和发展空间巨大。</p>
+                    <p><strong>传统行业赋能：</strong>利用您的运营知识和对AIGC的理解，为传统企业提供数字化转型咨询，市场广阔。</p>
 
-                        <h3>5. 颠覆性行动方案建议</h3>
-                        <p><strong>短期(1-3个月) - 技能准备与初始资源积累：</strong></p>
-                        <ul>
-                            <li><strong>不要辞职！</strong> 在职学习，保持现金流稳定。</li>
-                            <li><strong>专注应用层学习：</strong>不要陷入算法细节。 집중于学习如何使用主流AIGC工具（如ChatGPT, Midjourney, Stable Diffusion API等）解决实际的运营问题。例如，用ChatGPT做营销文案矩阵，用Midjourney生成广告素材。</li>
-                            <li><strong>产出作品集：</strong>将您的学习实践整理成一个在线作品集（例如一个简单的博客或Notion页面），展示您如何用AI技术为业务带来降本增效。这是您新岗位的敲门砖。</li>
-                        </ul>
-                        <p><strong>中期(3-6个月) - 切入市场与价值验证：</strong></p>
-                        <ul>
-                            <li><strong>在当前公司内部寻找机会：</strong>尝试将您的AIGC能力应用于本职工作，做出可量化的成绩，争取内部转岗或获得项目经验背书。</li>
-                            <li><strong>寻求外部“副业”项目：</strong>在Upwork、Fiverr或国内的远程工作平台，承接一些小型的AIGC内容生成、运营优化项目，积累实战经验和早期收入。</li>
-                            <li><strong>建立个人品牌：</strong>在知乎、即刻、LinkedIn等平台分享您的AIGC运营实战心得，吸引潜在雇主或合作伙伴的注意。</li>
-                        </ul>
-                        <p><strong>长期(6-12个月) - 实现职业跃迁：</strong></p>
-                        <ul>
-                            <li><strong>寻求高价值职位：</strong>凭借您的作品集、项目经验和个人品牌，瞄准“AI产品增长”、“AIGC策略师”等高薪职位，完成从传统运营到AI交叉领域人才的华丽转身。</li>
-                        </ul>
-                    </div>
-                `;
+                    <h3>3. 内部风险 (Weaknesses)</h3>
+                    <p><strong>技术壁垒：</strong>作为非技术背景出身，直接转型纯算法或开发岗存在较高的学习门槛和时间成本。</p>
 
-                reportOutputDiv.innerHTML = reportHTML;
+                    <h3>4. 外部挑战 (Threats)</h3>
+                    <p><strong>技术快速迭代：</strong>AIGC领域技术日新月异，需要持续不断的学习才能跟上步伐。</p>
 
-            }, 2500);
+                    <h3>5. 颠覆性行动方案建议</h3>
+                    <p><strong>短期(1-3个月) - 技能准备与初始资源积累：</strong></p>
+                    <ul>
+                        <li><strong>不要辞职！</strong> 在职学习，保持现金流稳定。</li>
+                        <li><strong>专注应用层学习：</strong>不要陷入算法细节。  집중于学习如何使用主流AIGC工具（如ChatGPT, Midjourney, Stable Diffusion API等）解决实际的运营问题。例如，用ChatGPT做营销文案矩阵，用Midjourney生成广告素材。</li>
+                        <li><strong>产出作品集：</strong>将您的学习实践整理成一个在线作品集（例如一个简单的博客或Notion页面），展示您如何用AI技术为业务带来降本增效。这是您新岗位的敲门砖。</li>
+                    </ul>
+                    <p><strong>中期(3-6个月) - 切入市场与价值验证：</strong></p>
+                    <ul>
+                        <li><strong>在当前公司内部寻找机会：</strong>尝试将您的AIGC能力应用于本职工作，做出可量化的成绩，争取内部转岗或获得项目经验背书。</li>
+                        <li><strong>寻求外部“副业”项目：</strong>在Upwork、Fiverr或国内的远程工作平台，承接一些小型的AIGC内容生成、运营优化项目，积累实战经验和早期收入。</li>
+                        <li><strong>建立个人品牌：</strong>在知乎、即刻、LinkedIn等平台分享您的AIGC运营实战心得，吸引潜在雇主或合作伙伴的注意。</li>
+                    </ul>
+                    <p><strong>长期(6-12个月) - 实现职业跃迁：</strong></p>
+                    <ul>
+                        <li><strong>寻求高价值职位：</strong>凭借您的作品集、项目经验和个人品牌，瞄准“AI产品增长”、“AIGC策略师”等高薪职位，完成从传统运营到AI交叉领域人才的华丽转身。</li>
+                    </ul>
+                    <button onclick="exportReport()" style="margin-top:20px; background-color:#28a745; width: auto; padding: 10px 20px;">付费导出报告 (¥1)</button>
+                </div>
+            `;
         }
 
         /* --- 支付弹窗 Javascript --- */
         const modal = document.getElementById('payment-modal');
         
         function showPaymentModal(productName, price) {
-            document.getElementById('payment-title').innerText = '购买：' + productName;
+            document.getElementById('payment-title').innerText = '支付：' + productName;
             document.getElementById('payment-amount').innerText = '¥ ' + price;
-            
-            // --- 重要：请在这里替换为您自己的二维码图片链接！ ---
-            document.getElementById('qr-code-image').src = 'https://s41.ax1x.com/2026/02/08/pZTtJWn.jpg';
-
+            document.getElementById('qr-code-image').src = 'https://s41.ax1x.com/2026/02/08/pZTtJWn.jpg'; // 确保二维码地址正确
             modal.style.display = 'flex';
         }
 
