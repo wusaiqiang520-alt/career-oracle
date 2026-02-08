@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <title>Career Oracle - AI职场决策顾问</title>
+    <title>Career Oracle - AI职场决策顾问</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -82,15 +82,61 @@
             margin: 10px;
             text-align: center;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
         .pricing-card h3 { margin-top: 0; color: #007bff;}
         .price { font-size: 24px; font-weight: bold; margin: 15px 0; }
-        .pricing-card ul { list-style: none; padding: 0; margin-bottom: 20px;}
+        .pricing-card ul { list-style: none; padding: 0; margin-bottom: 20px; text-align: left;}
         .pricing-card li { margin-bottom: 10px; }
         .pricing-card button {
             font-size: 16px;
             padding: 10px;
+            margin-top: auto;
         }
+
+        /* --- 支付弹窗样式 --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            width: 320px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #aaa;
+        }
+        .modal-content h3 { margin-top: 0; }
+        #qr-code-image {
+            width: 250px;
+            height: 250px;
+            margin: 15px auto;
+            display: block;
+            border: 1px solid #eee;
+        }
+        /* --- 弹窗样式结束 --- */
+
     </style>
 </head>
 <body>
@@ -114,42 +160,61 @@
         <h2>产品定价</h2>
         <div class="pricing-table">
             <div class="pricing-card">
-                <h3>单次咨询</h3>
-                <p class="price">¥29.9</p>
-                <ul>
-                    <li>一次性完整报告生成</li>
-                    <li>基础职业路径分析</li>
-                    <li>核心技能评估</li>
-                    <li>Email 支持</li>
-                </ul>
-                <button onclick="alert('支付接口开发中，暂未上线')">立即购买</button>
+                <div>
+                    <h3>单次咨询</h3>
+                    <p class="price">¥29.9</p>
+                    <ul>
+                        <li>✓ 一次性完整报告生成</li>
+                        <li>✓ 基础职业路径分析</li>
+                        <li>✓ 核心技能评估</li>
+                        <li>✓ Email 支持</li>
+                    </ul>
+                </div>
+                <button onclick="showPaymentModal('单次咨询', '29.9')">立即购买</button>
             </div>
             <div class="pricing-card" style="border-color: #007bff; transform: scale(1.05);">
-                <h3>年度订阅</h3>
-                <p class="price">¥199 / 年</p>
-                 <ul>
-                    <li>无限次报告生成</li>
-                    <li>高级职业路径模拟</li>
-                    <li>全方位技能矩阵分析</li>
-                    <li>月度行业趋势追踪</li>
-                    <li>优先 Email 支持</li>
-                </ul>
-                <button onclick="alert('支付接口开发中，暂未上线')">立即订阅</button>
+                <div>
+                    <h3>年度订阅</h3>
+                    <p class="price">¥199 / 年</p>
+                    <ul>
+                        <li>✓ 无限次报告生成</li>
+                        <li>✓ 高级职业路径模拟</li>
+                        <li>✓ 全方位技能矩阵分析</li>
+                        <li>✓ 月度行业趋势追踪</li>
+                        <li>✓ 优先 Email 支持</li>
+                    </ul>
+                </div>
+                <button onclick="showPaymentModal('年度订阅', '199')">立即订阅</button>
             </div>
             <div class="pricing-card">
-                <h3>企业服务</h3>
-                <p class="price">联系我们</p>
-                 <ul>
-                    <li>员工职业发展规划</li>
-                    <li>团队技能模型构建</li>
-                    <li>人才梯队建设咨询</li>
-                    <li>专属客户经理</li>
-                </ul>
-                <button onclick="alert('请联系 aiteamo@example.com')">联系我们</button>
+                <div>
+                    <h3>企业服务</h3>
+                    <p class="price">联系我们</p>
+                    <ul>
+                        <li>✓ 员工职业发展规划</li>
+                        <li>✓ 团队技能模型构建</li>
+                        <li>✓ 人才梯队建设咨询</li>
+                        <li>✓ 专属客户经理</li>
+                    </ul>
+                </div>
+                <button onclick="alert('请通过邮件联系 aiteamo@example.com 进行咨询')">联系我们</button>
             </div>
         </div>
 
     </div>
+
+    <!-- 支付弹窗 HTML -->
+    <div id="payment-modal" class="modal-overlay" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <h3 id="payment-title">支付</h3>
+            <p>请使用支付宝或微信扫码支付</p>
+            <p style="font-weight: bold; font-size: 28px; color: #d9534f;" id="payment-amount"></p>
+            <img id="qr-code-image" src="" alt="收款二维码">
+            <p style="font-size: 12px; color: #777;">支付后，请将“付款截图”和您的“咨询问题”发送至<br>aiteamo@example.com<br>我们会在24小时内为您发送报告。</p>
+        </div>
+    </div>
+    <!-- 弹窗HTML结束 -->
 
     <script>
         function generateReport() {
@@ -211,7 +276,27 @@
 
             }, 2500);
         }
+
+        /* --- 支付弹窗 Javascript --- */
+        const modal = document.getElementById('payment-modal');
+        
+        function showPaymentModal(productName, price) {
+            document.getElementById('payment-title').innerText = '购买：' + productName;
+            document.getElementById('payment-amount').innerText = '¥ ' + price;
+            
+            // --- 重要：请在这里替换为您自己的二维码图片链接！ ---
+            document.getElementById('qr-code-image').src = 'https://i.imgur.com/your-qr-code.png';
+
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+        /* --- 弹窗JS结束 --- */
+
     </script>
 
 </body>
 </html>
+       
